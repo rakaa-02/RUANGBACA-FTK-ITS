@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Logo sementara">
+  <circle cx="60" cy="60" r="56" fill="#fff" stroke="#1e3a8a" stroke-width="4"/>
+  <circle cx="60" cy="60" r="48" fill="none" stroke="#1e3a8a" stroke-width="1.2" stroke-dasharray="3 4"/>
+  <!-- buku terbuka -->
+  <path d="M30 50c10-5 20-5 30 2v28c-10-7-20-7-30-2z" fill="#1e3a8a"/>
+  <path d="M90 50c-10-5-20-5-30 2v28c10-7 20-7 30-2z" fill="#0a84c6"/>
+  <!-- ombak -->
+  <path d="M26 86c6 0 6-4 12-4s6 4 12 4 6-4 12-4 6 4 12 4 6-4 12-4 6 4 8 4" fill="none" stroke="#1e3a8a" stroke-width="3" stroke-linecap="round"/>
+  <text x="60" y="38" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#1e3a8a">RB</text>
+</svg>
