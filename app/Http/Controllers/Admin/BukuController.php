@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buku;
-use App\Services\XlsxExporter;
+use App\Services\ExcelExporter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -82,14 +82,10 @@ class BukuController extends Controller
             $b->no_class, $b->no_induk, $b->deskripsi_fisik, $b->isbn, $b->lokasi,
         ]);
 
-        $path = XlsxExporter::make('Daftar Buku', [
+        return ExcelExporter::unduh('daftar-buku-'.now()->format('Ymd'), 'Daftar Buku', [
             'ID', 'Tanggal Masuk', 'Judul', 'Pengarang', 'Kota Terbit', 'Penerbit', 'Tahun',
             'No Class', 'No Induk', 'Deskripsi Fisik', 'ISBN', 'Lokasi',
         ], $baris);
-
-        return response()
-            ->download($path, 'daftar-buku-'.now()->format('Ymd').'.xlsx')
-            ->deleteFileAfterSend(true);
     }
 
     private function validasi(Request $request): array

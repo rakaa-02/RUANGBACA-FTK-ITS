@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Visitor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Akun;
-use App\Models\Kunjungan;
 use App\Models\Peminjaman;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -28,8 +27,6 @@ class BerandaController extends Controller
             ->orderByDesc('tanggal_pinjam')->orderByDesc('id_peminjaman')
             ->paginate(8);
 
-        $hadir = Kunjungan::where('id_akun', $akun->id)->where('tanggal', now()->toDateString())->first();
-
-        return view('visitor.beranda', compact('akun', 'sedang', 'riwayat', 'hadir'));
+        return view('visitor.beranda', compact('akun', 'sedang', 'riwayat'));
     }
 }

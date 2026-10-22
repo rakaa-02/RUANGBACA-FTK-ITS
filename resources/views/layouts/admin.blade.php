@@ -22,8 +22,8 @@
             <a href="{{ route('admin.buku.index') }}" class="{{ request()->routeIs('admin.buku.*') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'buku']) Pendataan Buku</a>
             <a href="{{ route('admin.peminjaman.index') }}" class="{{ request()->routeIs('admin.peminjaman.*') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'pinjam']) Peminjaman</a>
             <a href="{{ route('admin.dipinjam') }}" class="{{ request()->routeIs('admin.dipinjam') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'jam']) Buku Dipinjam</a>
-            <a href="{{ route('admin.anggota.index') }}" class="{{ request()->routeIs('admin.anggota.*') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'orang']) Akun Mahasiswa</a>
-            <a href="{{ route('admin.pengunjung.index') }}" class="{{ request()->routeIs('admin.pengunjung.*') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'tumpuk']) Data Pengunjung</a>
+            <a href="{{ route('admin.peminjam.index') }}" class="{{ request()->routeIs('admin.peminjam.*') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'orang']) Daftar Peminjam</a>
+            <a href="{{ route('admin.anggota.index') }}" class="{{ request()->routeIs('admin.anggota.*') ? 'on' : '' }}">@include('partials.icons', ['nama' => 'tumpuk']) Akun Mahasiswa</a>
         </nav>
 
         <div class="side-foot">

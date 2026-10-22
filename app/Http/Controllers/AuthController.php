@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\Akun;
-use App\Models\Kunjungan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -57,12 +56,6 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
         $request->session()->put(['peran' => 'visitor', 'uid' => $akun->id, 'nama' => $akun->Nickname]);
-
-        // login mahasiswa = tercatat hadir hari ini (sekali per hari)
-        Kunjungan::firstOrCreate(
-            ['id_akun' => $akun->id, 'tanggal' => now()->toDateString()],
-            ['fakultas' => $akun->Fakultas, 'jam' => now()->format('H:i:s')]
-        );
 
         return redirect()->route('visitor.beranda');
     }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Buku;
-use App\Models\Kunjungan;
 use App\Models\Peminjaman;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -16,6 +15,8 @@ class DashboardController extends Controller
     {
         $now = now();
         $today = $now->toDateString();
+        $kemarin = $now->copy()->subDay()->toDateString();
+
         $year = (int) $request->input('year', $now->year);
         $years = range($now->year, $now->year - 3);
         if (! in_array($year, $years, true)) {
@@ -27,26 +28,22 @@ class DashboardController extends Controller
         $awalTahun = Carbon::create($year, 1, 1)->toDateString();
         $akhirTahun = Carbon::create($year, 12, 31)->toDateString();
 
+        // Kartu ringkasan
         $stats = [
-            'pengunjung' => Kunjungan::whereBetween('tanggal', [$awalBulan, $akhirBulan])->count(),
             'peminjaman' => Peminjaman::whereBetween('tanggal_pinjam', [$awalBulan, $akhirBulan])->count(),
             'buku_baru' => Buku::whereBetween('tanggal', [$awalBulan, $akhirBulan])->count(),
             'koleksi' => Buku::count(),
-        ];
-
-        // Ringkasan sirkulasi (kartu kedua)
-        $sirkulasi = [
-            'hari_ini' => Peminjaman::where('tanggal_pinjam', $today)->count(),
-            'kemarin' => Peminjaman::where('tanggal_pinjam', $now->copy()->subDay()->toDateString())->count(),
+            'dipinjam_hari_ini' => Peminjaman::where('tanggal_pinjam', $today)->count(),
+            'dipinjam_kemarin' => Peminjaman::where('tanggal_pinjam', $kemarin)->count(),
             'belum_kembali' => Peminjaman::aktif()->count(),
             'terlambat' => Peminjaman::aktif()->where('batas_pengembalian', '<', $today)->count(),
         ];
 
-        // Grafik 1: kunjungan harian
-        $harian = Kunjungan::selectRaw('tanggal, count(*) as total')
-            ->whereBetween('tanggal', [$awalTahun, $akhirTahun])
-            ->groupBy('tanggal')
-            ->orderBy('tanggal')
+        // Grafik 1: jumlah peminjaman per hari (hari yang ada peminjaman)
+        $harian = Peminjaman::selectRaw('tanggal_pinjam as tanggal, count(*) as total')
+            ->whereBetween('tanggal_pinjam', [$awalTahun, $akhirTahun])
+            ->groupBy('tanggal_pinjam')
+            ->orderBy('tanggal_pinjam')
             ->get();
 
         $chartHarian = [
@@ -54,23 +51,17 @@ class DashboardController extends Controller
             'data' => $harian->pluck('total')->map(fn ($v) => (int) $v)->all(),
         ];
 
-        // Grafik 2: rata-rata pengunjung per hari aktif, per fakultas
-        $fakultas = Kunjungan::selectRaw('fakultas, count(*) as total, count(distinct tanggal) as hari')
-            ->whereBetween('tanggal', [$awalTahun, $akhirTahun])
-            ->groupBy('fakultas')
-            ->get()
-            ->map(fn ($r) => [
-                'fakultas' => $r->fakultas,
-                'rata' => round($r->total / max(1, $r->hari), 1),
-                'total' => (int) $r->total,
-            ])
-            ->sortByDesc('rata')
-            ->values();
+        // Grafik 2: jumlah peminjaman per fakultas/departemen (dari akun peminjam)
+        $fakultas = Peminjaman::join('akun', 'akun.id', '=', 'peminjaman.id_akun')
+            ->whereBetween('peminjaman.tanggal_pinjam', [$awalTahun, $akhirTahun])
+            ->selectRaw('akun.Fakultas as fakultas, count(*) as total')
+            ->groupBy('akun.Fakultas')
+            ->orderByDesc('total')
+            ->get();
 
         $chartFakultas = [
             'labels' => $fakultas->pluck('fakultas')->all(),
-            'data' => $fakultas->pluck('rata')->all(),
-            'total' => $fakultas->pluck('total')->all(),
+            'data' => $fakultas->pluck('total')->map(fn ($v) => (int) $v)->all(),
         ];
 
         // Grafik 3: buku baru per bulan (kolom `tanggal` di tabel buku)
@@ -88,6 +79,6 @@ class DashboardController extends Controller
             'data' => $bulan,
         ];
 
-        return view('admin.dashboard', compact('stats', 'sirkulasi', 'year', 'years', 'chartHarian', 'chartFakultas', 'chartBuku'));
+        return view('admin.dashboard', compact('stats', 'year', 'years', 'chartHarian', 'chartFakultas', 'chartBuku'));
     }
 }

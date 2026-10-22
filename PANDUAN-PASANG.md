@@ -1,4 +1,4 @@
-# Ruang Baca FTK — Laravel 13 (versi 2, memakai database lama)
+# Ruang Baca FTK — Laravel 13 (versi 3, memakai database lama)
 
 Paket ini berisi file aplikasi saja. Nama tabel dan kolom **sama dengan database SIM lama**
 (`admin`, `akun`, `buku`, `peminjaman`), jadi file `.sql` lama bisa diimpor apa adanya.
@@ -41,8 +41,7 @@ cd C:\laragon\www\ruangbaca
 php artisan migrate
 php artisan rb:amankan-password
 ```
-- `migrate` membuat tabel baru `kunjungan` (untuk statistik pengunjung) dan tabel sesi Laravel.
-  Tabel lama yang sudah Anda impor **tidak disentuh**.
+- `migrate` membuat tabel sesi Laravel. Tabel lama yang sudah Anda impor **tidak disentuh**.
 - `rb:amankan-password` mengubah password teks biasa di database lama menjadi hash.
   Password admin di database lama tersimpan sebagai teks biasa, jadi sebaiknya dijalankan sekali.
   (Login juga otomatis meng-hash password lama saat pemiliknya berhasil masuk.)
@@ -52,20 +51,30 @@ Buka http://ruangbaca.test (Reload Laragon dulu). Bila tidak bisa: `php artisan 
 ## 6. Login
 - **Admin / Petugas**: pilih "Admin / Petugas", pakai username dan password dari tabel `admin` lama.
 - **Mahasiswa**: pilih "Visitor", pakai Nickname dan password dari tabel `akun` lama.
-  Login mahasiswa otomatis tercatat sebagai kunjungan hari itu (sekali per hari).
 
 ## Halaman
 | Peran | URL | Isi |
 |---|---|---|
-| Admin | `/admin/dashboard` | Kartu ringkasan, kartu sirkulasi, 3 grafik (tooltip jumlah harian) |
+| Admin | `/admin/dashboard` | Kartu ringkasan (termasuk "Buku Dipinjam"), 3 grafik dengan tooltip jumlah harian |
 | Admin | `/admin/buku` | Daftar buku: cari, tambah, edit, hapus, Export Excel |
 | Admin | `/admin/peminjaman` | Form peminjaman + daftar terbaru, denda, tombol Kembalikan |
 | Admin | `/admin/dipinjam` | **Buku dipinjam** hari ini / kemarin / 7 / 30 hari / semua / rentang tanggal; filter status |
+| Admin | `/admin/peminjam` | **Daftar mahasiswa yang meminjam**: sedang meminjam, terlambat, pernah meminjam; klik "Lihat detail" untuk riwayat per mahasiswa |
 | Admin | `/admin/anggota` | Kelola akun mahasiswa (dibuat admin) |
-| Admin | `/admin/pengunjung` | Tabel kunjungan, filter tanggal |
 | Mahasiswa | `/mahasiswa/beranda` | Buku yang sedang dipinjam (judul, tanggal pinjam, batas, terlambat/denda) dan riwayat |
 
 Mahasiswa tidak bisa membuka halaman admin, dan sebaliknya.
+
+## Grafik dashboard
+Grafik memakai data peminjaman, karena database lama tidak punya data pengunjung:
+- Statistik Peminjaman (per hari, arahkan kursor untuk jumlahnya)
+- Peminjaman by Fakultas
+- Buku Baru per Bulan
+
+## Export Excel
+Butuh ekstensi PHP `zip` untuk menghasilkan `.xlsx`. Di Laragon: klik kanan ikon Laragon → PHP → Extensions → centang `zip`,
+lalu Reload/Restart. Bila ekstensi belum aktif, aplikasi otomatis menghasilkan berkas `.xls` yang tetap bisa dibuka di Excel
+(Excel mungkin menampilkan peringatan format; pilih Yes/Buka).
 
 ## Mengganti logo
 Timpa `public/img/logo.svg` dengan logo Anda (nama sama). Bila logonya PNG, ubah `logo.svg` menjadi
@@ -81,7 +90,12 @@ Timpa `public/img/logo.svg` dengan logo Anda (nama sama). Bila logonya PNG, ubah
   menghapus akun lain juga menghapus riwayat peminjamannya (aturan FK di database lama).
 - Default batas kembali di form peminjaman: 14 hari.
 
-## Data contoh grafik (opsional)
-Database lama tidak punya data kunjungan, jadi grafik kosong sampai mahasiswa login.
-Untuk mencoba tampilan grafik: `php artisan db:seed --class=KunjunganDemoSeeder`
-Hapus lagi dengan `DELETE FROM kunjungan;` di HeidiSQL.
+## Memperbarui dari versi 2
+Salin ulang isi zip (Replace). File berikut tidak dipakai lagi dan boleh dihapus:
+- `app/Models/Kunjungan.php`
+- `app/Http/Controllers/Admin/KunjunganController.php`
+- `database/seeders/KunjunganDemoSeeder.php`
+- `database/migrations/2026_10_21_000002_create_kunjungan_table.php`
+- folder `resources/views/admin/pengunjung`
+
+Tabel `kunjungan` di database tidak dipakai lagi; hapus lewat phpMyAdmin bila mau: `DROP TABLE kunjungan;`

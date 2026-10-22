@@ -21,11 +21,6 @@ class Akun extends Model
         return $this->hasMany(Peminjaman::class, 'id_akun');
     }
 
-    public function kunjungan(): HasMany
-    {
-        return $this->hasMany(Kunjungan::class, 'id_akun');
-    }
-
     public function scopeCari(Builder $q, ?string $kata): Builder
     {
         if (! $kata) {

@@ -5,10 +5,7 @@
 @section('content')
 <section class="hello">
     <h1>Halo, {{ $akun->Nickname }}</h1>
-    <p>
-        {{ $akun->Fakultas }} · NIM {{ $akun->NIM }}
-        @if ($hadir) · Kehadiran hari ini tercatat pukul {{ substr($hadir->jam, 0, 5) }} @endif
-    </p>
+    <p>{{ $akun->Fakultas }} · NIM {{ $akun->NIM }}</p>
 </section>
 
 <div class="card-head"><h2>Buku yang Sedang Anda Pinjam</h2></div>

@@ -37,8 +37,8 @@ Route::middleware(PeranMiddleware::class.':admin')->prefix('admin')->name('admin
 
     Route::resource('anggota', Admin\AnggotaController::class)->except('show')->parameters(['anggota' => 'akun']);
 
-    Route::get('/pengunjung', [Admin\KunjunganController::class, 'index'])->name('pengunjung.index');
-    Route::delete('/pengunjung/{kunjungan}', [Admin\KunjunganController::class, 'destroy'])->name('pengunjung.destroy');
+    Route::get('/peminjam', [Admin\PeminjamController::class, 'index'])->name('peminjam.index');
+    Route::get('/peminjam/{akun}', [Admin\PeminjamController::class, 'show'])->name('peminjam.show');
 });
 
 // ── Mahasiswa / siswa ────────────────────────────────────────────────
